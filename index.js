@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const PORT = 4000;
 const cors = require('cors');
+var bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 const config = require('./DB.js');
 
@@ -18,13 +19,14 @@ mongoose.connect(config.DB, { useNewUrlParser: true, useUnifiedTopology: true })
     }
 );
 
-// Express routes
-app.use('/users', userRoutes);
-
 // Express server
 app.use(cors());
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
+
+// Express routes
+app.use('/users', userRoutes);
+
 app.listen(PORT, () => {
     console.log('Express server running on port:', PORT);
 });
