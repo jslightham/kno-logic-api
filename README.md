@@ -11,7 +11,9 @@ If you would like to run the application you will need:
  - MongoDB Community
 
 Install the latest version of [`Node.js`](https://nodejs.org/en/). 
+
 Install the latest version of [`MongoDB Community Server`](https://www.mongodb.com/community). 
+
 Clone the repository, and run the following:
 ```bash
 # start database
