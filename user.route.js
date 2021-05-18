@@ -46,6 +46,7 @@ userRoutes.route('/create').post((req, res) => {
                     res.status(409).send("Account already exists");
                     return;
                 }
+                u.permission = 0;
                 u.save()
                     .then(() => {
                         res.status(201).send("Success creating user");
@@ -66,6 +67,7 @@ userRoutes.route('/create').post((req, res) => {
               401 - Incorrect
 */
 userRoutes.route('/login').post((req, res) => {
+    console.log(req.body);
     if (!req.body) {
         res.status(401).send("Missing body");
         return;

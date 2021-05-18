@@ -8,6 +8,8 @@ const utils = require ('./utils');
 const CronJob = require('cron').CronJob;
 const config = require('./DB.js');
 const userRoutes = require('./user.route');
+const postRoutes = require('./post.route');
+const categoryRoutes = require('./category.route');
 
 console.log("Starting Kno-Logic Backend Server");
 
@@ -31,7 +33,9 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
 
 // Express routes
-app.use('/users', userRoutes);
+app.use('/user', userRoutes);
+app.use('/post', postRoutes);
+app.use('/category', categoryRoutes);
 
 app.listen(PORT, () => {
     console.log('Express server running on port:', PORT);

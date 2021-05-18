@@ -95,6 +95,44 @@ const sendMail = async (user, message, replacements) => {
     }
 }
 
+
+// checkSession(userId, sessionId) checks if the sessionId is valid for the user
+const checkSession = (userId, sessionId, f) => {
+    Session.find({userId: userId, sessionId: sessionId }, (err, res) => {
+        if (res) {
+            f(true);
+            return;
+        }
+        f(false);
+    });
+}
+
+// isAdmin(userId) checks if the user with userId is an administrator
+const isAdmin = (userId, f) => {
+    User.findById(userId, (err, res) => {
+        if(res.permission == 1) {
+            f(true);
+            return;
+        }
+        f(false);
+    })
+}
+
+// dateToEpoch(date) change the time of the date object to epoch
+function dateToEpoch(d) {
+    console.log(d);
+    if (d) {
+        // When comparing js dates, the timezone does not matter
+        // ex. May 17 EDT == May 17 GMT, May 17 EDT != May 18 GMT
+        return d.setHours(0,0,0,0);
+    } else {
+        return null;
+    }
+ }
+
 module.exports.purgeSessions = purgeSessions;
 module.exports.loadDefaultTemplates = loadDefaultTemplates;
 module.exports.sendMail = sendMail;
+module.exports.checkSession = checkSession;
+module.exports.isAdmin = isAdmin;
+module.exports.dateToEpoch = dateToEpoch;

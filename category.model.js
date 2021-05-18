@@ -2,18 +2,15 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // Database schema for an email message
-let Message = new Schema({
+let Category = new Schema({
     name: {
         type: String
     },
-    subject: {
+    color: {
         type: String
     },
-    body: {
-        type: String
-    }
 }, {
-    collection: 'messages'
+    collection: 'categories'
 });
 
-module.exports = mongoose.model('Message', Message);
+module.exports = mongoose.model('Category', Category);
