@@ -1,4 +1,4 @@
-const utils = require ('./utils');
+const utils = require('./utils');
 const express = require('express');
 const bcrypt = require('bcrypt');
 const userRoutes = express.Router();
@@ -8,6 +8,7 @@ const sessionLength = 25;
 
 let Session = require('./session.model');
 let User = require('./user.model');
+let Post = require('./post.model');
 
 /*
     POST - /user/create
@@ -26,19 +27,16 @@ userRoutes.route('/create').post((req, res) => {
         res.status(401).send("Empty fields");
         return;
     }
-    console.log(req.body);
     let u = new User(req.body);
-    // TODO: Look for a different encryption method that can scale more easily
     bcrypt.hash(u.password, saltRounds, (err, hash) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.status(500).send("Error creating user");;
         } else {
-            console.log(hash);
             u.password = hash;
             User.find({ email: u.email }, (err, arr) => {
                 if (err) {
-                    console.log(err);
+                    console.error(err);
                     res.status(500).send("Error creating user");
                 }
                 // Account already exists
@@ -67,7 +65,6 @@ userRoutes.route('/create').post((req, res) => {
               401 - Incorrect
 */
 userRoutes.route('/login').post((req, res) => {
-    console.log(req.body);
     if (!req.body) {
         res.status(401).send("Missing body");
         return;
@@ -80,7 +77,7 @@ userRoutes.route('/login').post((req, res) => {
     }
     User.findOne({ email: req.body.email }, (err, u) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.status(500).send("Error logging in user");
             return;
         }
@@ -92,7 +89,7 @@ userRoutes.route('/login').post((req, res) => {
 
         bcrypt.compare(req.body.password, u.password, (err, result) => {
             if (err) {
-                console.log(err);
+                console.error(err);
                 res.status(500).send("Error logging in user");
                 return;
             }
@@ -125,9 +122,9 @@ userRoutes.route('/login').post((req, res) => {
               400 - No session exists
 */
 userRoutes.route('/logout').post((req, res) => {
-    Session.findOne({sessionId: req.body.sessionId}, (err, sess) => {
+    Session.findOne({ sessionId: req.body.sessionId }, (err, sess) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.status(500).send("Error logging out");
             return;
         }
@@ -141,7 +138,8 @@ userRoutes.route('/logout').post((req, res) => {
             .then(() => {
                 res.status(201).send("Success deleting session");
             })
-            .catch(() => {
+            .catch((e) => {
+                console.error(e);
                 res.status(500).send("Error logging out");
             });
 
@@ -149,6 +147,95 @@ userRoutes.route('/logout').post((req, res) => {
 });
 
 // TODO: Add forgotten password route
+
+/*
+    POST - /user/favorite/add
+    Add a favorite article
+    Response: 200 - OK
+              401 - Unauthorized
+*/
+userRoutes.route('/favorite/add').post((req, res) => {
+    utils.checkSession(req.body.userId, req.body.sessionId, valid => {
+        if (valid) {
+            User.findById(req.body.userId, (err, user) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).send("Error adding article");
+                    return;
+                }
+                user.favorites.push(req.body.postId);
+                user.save()
+                    .then(() => {
+                        res.status(201).send("Success saving article");
+                    })
+                    .catch((e) => {
+                        console.error(e);
+                        res.status(500).send("Error saving article");
+                    });
+            })
+        } else {
+            res.status(401).send("Unauthorized");
+        }
+    })
+})
+
+/*
+    POST - /user/favorite/remove
+    Remove a favorite article
+    Response: 200 - OK
+              401 - Unauthorized
+*/
+userRoutes.route('/favorite/remove').post((req, res) => {
+    utils.checkSession(req.body.userId, req.body.sessionId, valid => {
+        if (valid) {
+            User.findById(req.body.userId, (err, user) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).send("Error removing article");
+                    return;
+                }
+                user.favorites = utils.removeValue(user.favorites, req.body.articleId);
+                user.save()
+                    .then(() => {
+                        res.status(201).send("Success removing article");
+                    })
+                    .catch((e) => {
+                        console.error(e);
+                        res.status(500).send("Error removing article");
+                    });
+            })
+        } else {
+            res.status(401).send("Unauthorized");
+        }
+    })
+})
+
+/*
+    POST - /user/favorite/get
+    Get all favorite articles
+    Response: 200 - OK
+              401 - Unauthorized
+*/
+userRoutes.route('/favorite/get').post((req, res) => {
+    utils.checkSession(req.body.userId, req.body.sessionId, valid => {
+        if (valid) {
+            User.findById(req.body.userId, (err, user) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).send("Error removing article");
+                    return;
+                }
+                console.log(user.favorites);
+                Post.find({ '_id': { $in: user.favorites } }, (err, postArray) => {
+                    res.json(postArray);
+                })
+            })
+        } else {
+            res.status(401).send("Unauthorized");
+        }
+    })
+})
+
 
 module.exports = userRoutes;
 

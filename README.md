@@ -34,6 +34,8 @@ Emails are stored in the [`templates`](https://github.com/jslightham/kno-logic-a
 
 Any portion of the message can be replaced when sending the email. The convention used in all default email templates  is `%replace_string%`. The replace string does not matter since when calling the sendMail function, replacements is an array of data with the form `{from: "%replace_string%", to: "Username"}`. 
 
+Email subjects are the first line of the file, which are removed from the email body.
+
 ## Configuration
 Configuration for the application is done in the [`config.js`](https://github.com/jslightham/kno-logic-api/blob/main/config.js) file. 
 

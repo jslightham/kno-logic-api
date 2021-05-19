@@ -14,6 +14,9 @@ let User = new Schema({
     },
     permission: {
         type: Number
+    },
+    favorites: {
+        type: Array
     }
 }, {
     collection: 'users'

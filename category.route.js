@@ -27,7 +27,7 @@ categoryRoutes.route('/create').post((req, res) => {
                         res.json(c);
                     })
                     .catch((e) => {
-                        console.log(e);
+                        console.error(e);
                         res.status(500).send("Error creating category");
                     });
             } else {
@@ -46,7 +46,7 @@ categoryRoutes.route('/create').post((req, res) => {
 categoryRoutes.route('/all').get((req, res) => {
     Category.find({}, (err, cArr) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.status(500).send("Error getting categories");
             return;
         }
@@ -62,7 +62,7 @@ categoryRoutes.route('/all').get((req, res) => {
 categoryRoutes.route('/posts').get((req, res) => {
     Post.find({}, (err, postArr) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.status(500).send("Error getting posts");
             return;
         }

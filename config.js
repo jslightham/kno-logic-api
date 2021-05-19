@@ -3,11 +3,11 @@ var config = {};
 // Mailer settings
 config.mail = {};
 config.mail.host = "localhost";
-config.mail.port = "465";
+config.mail.port = "587";
 config.mail.secure = false;
-config.mail.user = "username";
-config.mail.pass = "pass";
-config.mail.from = "<noreply@knologic.com>"
+config.mail.user = "email";
+config.mail.pass = "password";
+config.mail.from = "name"
 
 // Session purge settings
 config.maxSessionLength = 30;

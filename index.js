@@ -10,6 +10,7 @@ const config = require('./DB.js');
 const userRoutes = require('./user.route');
 const postRoutes = require('./post.route');
 const categoryRoutes = require('./category.route');
+const mongoSanitize = require('express-mongo-sanitize');
 
 console.log("Starting Kno-Logic Backend Server");
 
@@ -31,6 +32,9 @@ mongoose.connect(config.DB, { useNewUrlParser: true, useUnifiedTopology: true })
 app.use(cors());
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
+
+// Sanitize data to prevent NoSQL injections
+app.use(mongoSanitize());
 
 // Express routes
 app.use('/user', userRoutes);

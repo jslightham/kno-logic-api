@@ -1,3 +1,4 @@
+Welcome to Kno-Logic!
 Hello %name%,
 
-Welcome to kno-logic! 
+Welcome to the kno-logic app. Thank you for...
