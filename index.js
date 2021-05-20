@@ -4,12 +4,12 @@ const app = express();
 const PORT = 4000;
 const cors = require('cors');
 const mongoose = require('mongoose');
-const utils = require ('./utils');
+const utils = require ('./utils/utils');
 const CronJob = require('cron').CronJob;
 const config = require('./DB.js');
-const userRoutes = require('./user.route');
-const postRoutes = require('./post.route');
-const categoryRoutes = require('./category.route');
+const userRoutes = require('./routes/user.route');
+const postRoutes = require('./routes/post.route');
+const categoryRoutes = require('./routes/category.route');
 const mongoSanitize = require('express-mongo-sanitize');
 
 console.log("Starting Kno-Logic Backend Server");
@@ -19,12 +19,12 @@ mongoose.Promise = global.Promise;
 mongoose.connect(config.DB, { useNewUrlParser: true, useUnifiedTopology: true }).then(
     () => {
         console.log('Connected to dabase');
-        utils.loadDefaultTemplates();
-        utils.purgeSessions();
+        utils.mail.loadDefaultTemplates();
+        utils.cron.purgeSessions();
     },
     err => {
-        console.log('Could not connect to database: ');
-        console.log(err);
+        console.error('Could not connect to database: ');
+        console.error(err);
     }
 );
 
@@ -46,5 +46,5 @@ app.listen(PORT, () => {
 });
 
 // Cron jobs
-var purge = new CronJob('*/5 * * * *', utils.purgeSessions);
+var purge = new CronJob('*/5 * * * *', utils.cron.purgeSessions);
 purge.start();

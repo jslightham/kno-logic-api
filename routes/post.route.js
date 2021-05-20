@@ -1,11 +1,11 @@
-const utils = require('./utils');
+const utils = require('../utils/utils');
 const express = require('express');
 const postRoutes = express.Router();
 
-let Post = require('./post.model');
-let Category = require('./category.model');
-let Session = require('./session.model');
-let User = require('./user.model');
+let Post = require('../schema/post.model');
+let Category = require('../schema/category.model');
+let Session = require('../schema/session.model');
+let User = require('../schema/user.model');
 
 /*
     POST - /post/create
@@ -18,17 +18,17 @@ postRoutes.route('/create').post((req, res) => {
         res.status(401).send("Missing body");
         return;
     }
-    utils.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
-        utils.isAdmin(req.body.userId, (isAdmin) => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
+        utils.account.isAdmin(req.body.userId, (isAdmin) => {
             if (isValidId && isAdmin) {
                 let p = new Post(req.body);
-                p.date = utils.dateToEpoch(p.date);
+                p.date = utils.date.dateToEpoch(p.date);
                 p.save()
                     .then(() => {
                         res.json(p);
                     })
                     .catch((e) => {
-                        console.log(e);
+                        console.error(e);
                         res.status(500).send("Error creating post");
                     });
             } else {
@@ -50,8 +50,8 @@ postRoutes.route('/delete').post((req, res) => {
         res.status(401).send("Missing body");
         return;
     }
-    utils.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
-        utils.isAdmin(req.body.userId, (isAdmin) => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
+        utils.account.isAdmin(req.body.userId, (isAdmin) => {
             if (isValidId && isAdmin) {
                 Post.findByIdAndDelete(req.body._id, (err, r) => {
                     if (err) {
@@ -79,8 +79,8 @@ postRoutes.route('/edit').post((req, res) => {
         res.status(401).send("Missing body");
         return;
     }
-    utils.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
-        utils.isAdmin(req.body.userId, (isAdmin) => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
+        utils.account.isAdmin(req.body.userId, (isAdmin) => {
             if (isValidId && isAdmin) {
                 Post.findById(req.body._id, (err, r) => {
                     if (err) {
@@ -92,7 +92,7 @@ postRoutes.route('/edit').post((req, res) => {
                         res.json(r);
                     })
                     .catch((e) => {
-                        console.log(e);
+                        console.error(e);
                         res.status(500).send("Error creating post");
                     });
                     res.status(200).send("Edited post");
@@ -114,7 +114,7 @@ postRoutes.route('/edit').post((req, res) => {
 postRoutes.route('/id').post((req, res) => {
     Post.findById(req.body._id, (err, post) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.status(500).send("Error getting posts");
             return;
         }
@@ -129,10 +129,10 @@ postRoutes.route('/id').post((req, res) => {
 */
 postRoutes.route('/date').post((req, res) => {
     let d = new Date(req.body.date);
-    d = utils.dateToEpoch(d);
+    d = utils.date.dateToEpoch(d);
     Post.find({ date: d}, (err, post) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.status(500).send("Error getting posts");
             return;
         }
@@ -149,7 +149,7 @@ postRoutes.route('/date').post((req, res) => {
 postRoutes.route('/all').get((req, res) => {
     Post.find({}, (err, postArr) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.status(500).send("Error getting posts");
             return;
         }
@@ -165,10 +165,10 @@ postRoutes.route('/all').get((req, res) => {
 */
 postRoutes.route('/today').get((req, res) => {
     let date = new Date();
-    date = utils.dateToEpoch(date);
+    date = utils.date.dateToEpoch(date);
     Post.find({ date: date }, (err, postArr) => {
         if (err) {
-            console.log(err);
+            console.error(err);
             res.status(500).send("Error getting posts");
             return;
         }

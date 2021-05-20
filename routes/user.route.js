@@ -1,4 +1,4 @@
-const utils = require('./utils');
+const utils = require('../utils/utils');
 const express = require('express');
 const bcrypt = require('bcrypt');
 const userRoutes = express.Router();
@@ -6,9 +6,9 @@ const userRoutes = express.Router();
 const saltRounds = 10;
 const sessionLength = 25;
 
-let Session = require('./session.model');
-let User = require('./user.model');
-let Post = require('./post.model');
+let Session = require('../schema/session.model');
+let User = require('../schema/user.model');
+let Post = require('../schema/post.model');
 
 /*
     POST - /user/create
@@ -155,7 +155,7 @@ userRoutes.route('/logout').post((req, res) => {
               401 - Unauthorized
 */
 userRoutes.route('/favorite/add').post((req, res) => {
-    utils.checkSession(req.body.userId, req.body.sessionId, valid => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, valid => {
         if (valid) {
             User.findById(req.body.userId, (err, user) => {
                 if (err) {
@@ -186,7 +186,7 @@ userRoutes.route('/favorite/add').post((req, res) => {
               401 - Unauthorized
 */
 userRoutes.route('/favorite/remove').post((req, res) => {
-    utils.checkSession(req.body.userId, req.body.sessionId, valid => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, valid => {
         if (valid) {
             User.findById(req.body.userId, (err, user) => {
                 if (err) {
@@ -194,7 +194,7 @@ userRoutes.route('/favorite/remove').post((req, res) => {
                     res.status(500).send("Error removing article");
                     return;
                 }
-                user.favorites = utils.removeValue(user.favorites, req.body.articleId);
+                user.favorites = utils.array.removeValue(user.favorites, req.body.articleId);
                 user.save()
                     .then(() => {
                         res.status(201).send("Success removing article");
@@ -217,7 +217,7 @@ userRoutes.route('/favorite/remove').post((req, res) => {
               401 - Unauthorized
 */
 userRoutes.route('/favorite/get').post((req, res) => {
-    utils.checkSession(req.body.userId, req.body.sessionId, valid => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, valid => {
         if (valid) {
             User.findById(req.body.userId, (err, user) => {
                 if (err) {
@@ -225,7 +225,6 @@ userRoutes.route('/favorite/get').post((req, res) => {
                     res.status(500).send("Error removing article");
                     return;
                 }
-                console.log(user.favorites);
                 Post.find({ '_id': { $in: user.favorites } }, (err, postArray) => {
                     res.json(postArray);
                 })

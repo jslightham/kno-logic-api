@@ -1,11 +1,11 @@
-const utils = require('./utils');
+const utils = require('../utils/utils');
 const express = require('express');
 const categoryRoutes = express.Router();
 
-let Post = require('./post.model');
-let Category = require('./category.model');
-let Session = require('./session.model');
-let User = require('./user.model');
+let Post = require('../schema/post.model');
+let Category = require('../schema/category.model');
+let Session = require('../schema/session.model');
+let User = require('../schema/user.model');
 
 /*
     POST - /category/create
@@ -18,8 +18,8 @@ categoryRoutes.route('/create').post((req, res) => {
         res.status(401).send("Missing body");
         return;
     }
-    utils.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
-        utils.isAdmin(req.body.userId, (isAdmin) => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
+        utils.account.isAdmin(req.body.userId, (isAdmin) => {
             if (isValidId && isAdmin) {
                 let c = new Category(req.body);
                 c.save()
