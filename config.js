@@ -20,7 +20,8 @@ config.mail.from = "name";
  * Session purge settings
 */
 // Maximum session length in days
-config.maxSessionLength = 30;
+config.maxSessionLength = 1;
+config.maxRefreshLength = 360;
 
 /*
  * SSL settings

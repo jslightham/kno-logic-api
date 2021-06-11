@@ -235,6 +235,27 @@ userRoutes.route('/favorite/get').post((req, res) => {
     })
 })
 
+userRoutes.route('/refresh').post((req, res) => {
+    utils.account.checkRefresh(req.body.userId, req.body.refresh, valid => {
+        if (valid) {
+            let s = new Session();
+                s.sessionId = generateSession();
+                s.userId = u._id;
+                s.date = new Date();
+
+                s.save()
+                    .then(() => {
+                        res.json(s);
+                    })
+                    .catch(() => {
+                        res.status(500).send("Error logging in user");
+                    });
+        } else {
+            res.status(401).send("Incorrect refresh token");
+        }
+    }
+});
+
 
 module.exports = userRoutes;
 

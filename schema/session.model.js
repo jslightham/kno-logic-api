@@ -11,6 +11,9 @@ let Session = new Schema({
     },
     date: {
         type: Date
+    },
+    type: {
+        type: Number // 0 for sessionID, 1 for refresh token
     }
 }, {
     collection: 'sessions'

@@ -1,10 +1,22 @@
 let User = require('../schema/user.model');
 let Session = require('../schema/session.model');
+const bcrypt = require('bcrypt');
 
 // checkSession(userId, sessionId) checks if the sessionId is valid for the user
 const checkSession = (userId, sessionId, f) => {
     Session.find({ userId: userId, sessionId: sessionId }, (err, res) => {
-        if (res) {
+        if (res && res.type == 0) {
+            f(true);
+            return;
+        }
+        f(false);
+    });
+}
+
+// checkRefresh(userId, sessionId) checks if the refresh token is valid for the user
+const checkRefresh = (userId, sessionId, f) => {
+    Session.find({ userId: userId, sessionId: sessionId }, (err, res) => {
+        if (res && res.type == 1) {
             f(true);
             return;
         }
