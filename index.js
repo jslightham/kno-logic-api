@@ -14,6 +14,7 @@ const categoryRoutes = require('./routes/category.route');
 const mongoSanitize = require('express-mongo-sanitize');
 const fs = require("fs");
 const { Http2ServerRequest } = require('http2');
+const https = require('https');
 
 console.log("Starting Kno-Logic Backend Server");
 
