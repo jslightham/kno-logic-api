@@ -13,7 +13,7 @@ If you would like to run the application you will need:
 
 Install the latest version of [`Node.js`](https://nodejs.org/en/). 
 
-Install the latest version of [`MongoDB Community Server`](https://www.mongodb.com/community). 
+Install the latest version of [`MongoDB Community Server`](https://www.mongodb.com/try/download/community). 
 
 Clone the repository, and run the following:
 ```bash
@@ -30,7 +30,7 @@ nodemon
 node .
 ```
 ## Email Templates
-Emails are stored in the [`templates`](https://github.com/jslightham/kno-logic-api/tree/main/templates) directory. Any text files in the [`templates`](https://github.com/jslightham/kno-logic-api/tree/main/templates) directory will be added to the MongoDB message collection. 
+Emails are stored in the [`templates`](https://github.com/jslightham/kno-logic-api/tree/main/templates) directory. Any text files in the [`templates`](https://github.com/jslightham/kno-logic-api/tree/main/templates) directory will be added to the MongoDB message collection. The first line of the file is the subject of the email, and will be remoevd from the message body.
 
 Any portion of the message can be replaced when sending the email. The convention used in all default email templates  is `%replace_string%`. The replace string does not matter since when calling the sendMail function, replacements is an array of data with the form `{from: "%replace_string%", to: "Username"}`. 
 
