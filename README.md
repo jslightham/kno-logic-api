@@ -1,8 +1,5 @@
 
 # kno-logic-api
-<p align="center">
-  <img src="https://imgur.com/P2nDq7b.png" width="180">
-</p>
 
 Kno-logic is a mobile learning platform with a short number of curated articles added daily for lifelong learners. This API was built with NodeJS and Express, and uses MongoDB as a database.
 
