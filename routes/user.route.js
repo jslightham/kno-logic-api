@@ -9,6 +9,7 @@ const sessionLength = 25;
 let Session = require('../schema/session.model');
 let User = require('../schema/user.model');
 let Post = require('../schema/post.model');
+let Reset = require('../schema/reset.model');
 
 /*
     POST - /user/create
@@ -239,20 +240,149 @@ userRoutes.route('/refresh').post((req, res) => {
     utils.account.checkRefresh(req.body.userId, req.body.refresh, valid => {
         if (valid) {
             let s = new Session();
-                s.sessionId = generateSession();
-                s.userId = u._id;
-                s.date = new Date();
+            s.sessionId = generateSession();
+            s.userId = u._id;
+            s.date = new Date();
 
-                s.save()
-                    .then(() => {
-                        res.json(s);
-                    })
-                    .catch(() => {
-                        res.status(500).send("Error logging in user");
-                    });
+            s.save()
+                .then(() => {
+                    res.json(s);
+                })
+                .catch(() => {
+                    res.status(500).send("Error logging in user");
+                });
         } else {
             res.status(401).send("Incorrect refresh token");
         }
+    }
+    )
+});
+
+userRoutes.route('/check-email').post((req, res) => {
+    User.find({email: req.body.email}, (err, arr) => {
+        if (err) {
+            console.log(err);
+        }
+
+        if (arr.length > 0) {
+            res.status(400).send("Email already in use");
+        } else {
+            res.status(200).send("Email not in use");
+        }
+    })
+});
+
+userRoutes.route('/change-name').post((req, res) => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, valid => {
+        if (valid) {
+            User.findById(req.body.userId, (err, user) => {
+                if (err) {
+                    console.log(err);
+                }
+                if (user) {
+                    user.name = req.body.name;
+                    user.save();
+                    res.status(200).send("Success changing name");
+                } else {
+                    res.status(400).send("No user found with that ID");
+                }
+            })
+        } else {
+            res.status(401).send("Unauthorized");
+        }
+    })
+});
+
+userRoutes.route('/change-email').post((req, res) => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, valid => {
+        if (valid) {
+            User.findById(req.body.userId, (err, user) => {
+                if (err) {
+                    console.log(err);
+                }
+                if (user) {
+                    user.email = req.body.email;
+                    user.save();
+                    res.status(200).send("Success changing email");
+                } else {
+                    res.status(400).send("No user found with that ID");
+                }
+            })
+        } else {
+            res.status(401).send("Unauthorized");
+        }
+    })
+});
+
+userRoutes.route('/change-password').post((req, res) => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, valid => {
+        if (valid) {
+            User.findById(req.body.userId, (err, user) => {
+                if (err) {
+                    console.log(err);
+                }
+                if (user) {
+                    user.password = req.body.password;
+                    user.save();
+                    res.status(200).send("Success changing password");
+                } else {
+                    res.status(400).send("No user found with that ID");
+                }
+            })
+        } else {
+            res.status(401).send("Unauthorized");
+        }
+    })
+});
+
+userRoutes.route('/forgot-password').post((req, res) => {
+    if (req.body.email) {
+        User.findOne({ email: req.body.email }, (err, user) => {
+            if (err) {
+                console.log(err);
+            }
+            if (user) {
+                let pin = generatePin();
+                let r = new Reset();
+                r.userId = user._id;
+                r.pin = pin;
+                r.date = new Date();
+                r.save();
+                utils.mail.sendMail(user, "forgotPassword", [{from: "%name%", to: user.name}, {from: "%pin%", to: pin}]);
+                res.status(200).send("Success sending reset email");
+            } else {
+                res.status(400).send("No user found with that email");
+            }
+        }
+        )
+    }
+});
+
+userRoutes.route('/reset-password').post((req, res) => {
+    if (req.body.userId && req.body.pin) {
+        User.findOne({ email: req.body.email }, (err, user) => {
+            if (err) {
+                console.log(err);
+            }
+            if (user) {
+                Reset.findOne({ userId: user._id, pin: req.body.pin}, (err, reset) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    if (reset) {
+                        reset.remove();
+                        user.password = req.body.password;
+                        user.save();
+                        res.status(200).send("Success resetting password");
+                    } else {
+                        res.status(400).send("Invalid pin");
+                    }
+                })
+            } else {
+                res.status(400).send("No user found with that email");
+            }
+        }
+        )
     }
 });
 
@@ -263,6 +393,17 @@ function generateSession() {
     var length = sessionLength;
     var result = [];
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-+!@#$%^&*()';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result.push(characters.charAt(Math.floor(Math.random() * charactersLength)));
+    }
+    return result.join('');
+}
+
+function generatePin() {
+    var length = pinLength;
+    var result = [];
+    var characters = '0123456789';
     var charactersLength = characters.length;
     for (var i = 0; i < length; i++) {
         result.push(characters.charAt(Math.floor(Math.random() * charactersLength)));

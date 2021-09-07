@@ -42,7 +42,7 @@ const loadDefaultTemplates = () => {
 
 // sendMail(user, message, replacements) send an email with message to the user, making
 // replacements in the message
-// replacements is an array of data {from, to}
+// replacements is an array of data {from: "%example%", to: "replacement"}
 const sendMail = async (user, message, replacements) => {
     console.log("Sending mail...");
 
