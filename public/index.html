@@ -1,0 +1,73 @@
+<html>
+
+<head>
+    
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+</head>
+
+<body>
+    <center>
+        <h1>Kno-Logic Management Portal</h1>
+        <form>
+            <table border="black">
+                <th colspan="2">
+                    Login
+                </th>
+                <tr>
+                    <td>
+                        <label for="email">Email: </label>
+                    </td>
+                    <td>
+                        <input type="text" id="email" name="email">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="password">Password: </label>
+                    </td>
+                    <td>
+                        <input type="password" id="password" name="password">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <center><button type="button" onclick="login()">Login</button></center>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <a href="/manage/register.html">Register</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </center>
+</body>
+
+<script src="./consts.js"></script> 
+
+<script>
+    function login() {
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
+
+        (async () => {
+            const rawResponse = await fetch(backendURL + '/v1/user/login', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email, password: password })
+            });
+            const content = await rawResponse.text();
+
+            console.log(content);
+        })();
+
+    }
+</script>
+
+</html>
