@@ -15,7 +15,7 @@ let User = require('../schema/user.model');
 */
 postRoutes.route('/create').post((req, res) => {
     if (!req.body) {
-        res.status(401).send("Missing body");
+        res.status(401).json({ success: false, response: "Missing body" });
         return;
     }
     utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
@@ -25,14 +25,14 @@ postRoutes.route('/create').post((req, res) => {
                 p.date = utils.date.dateToEpoch(p.date);
                 p.save()
                     .then(() => {
-                        res.json(p);
+                        res.status(200).json({ success: true, response: p });
                     })
                     .catch((e) => {
                         console.error(e);
-                        res.status(500).send("Error creating post");
+                        res.status(500).json({ success: false, response: "Error creating post" });
                     });
             } else {
-                res.status(401).send("Invalid permissions to create post.");
+                res.status(401).json({ success: false, response: "Invalid permissions to create post" });
                 return;
             }
         })
@@ -47,7 +47,7 @@ postRoutes.route('/create').post((req, res) => {
 */
 postRoutes.route('/delete').post((req, res) => {
     if (!req.body) {
-        res.status(401).send("Missing body");
+        res.status(401).json({ success: false, response: "Missing body" });
         return;
     }
     utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
@@ -55,13 +55,13 @@ postRoutes.route('/delete').post((req, res) => {
             if (isValidId && isAdmin) {
                 Post.findByIdAndDelete(req.body._id, (err, r) => {
                     if (err) {
-                        res.status(500).send("Error deleting post");
+                        res.status(500).json({ success: false, response: "Error deleting post" });
                         return;
                     }
-                    res.status(200).send("Deleted post");
+                    res.status(200).json({ success: true, response: "Deleted post" });
                 });
             } else {
-                res.status(401).send("Invalid permissions to delete post.");
+                res.status(401).json({ success: false, response: "Invalid permissions to delete post." });
                 return;
             }
         })
@@ -76,7 +76,7 @@ postRoutes.route('/delete').post((req, res) => {
 */
 postRoutes.route('/edit').post((req, res) => {
     if (!req.body) {
-        res.status(401).send("Missing body");
+        res.status(401).json({ success: false, response: "Missing body" });
         return;
     }
     utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
@@ -84,7 +84,7 @@ postRoutes.route('/edit').post((req, res) => {
             if (isValidId && isAdmin) {
                 Post.findById(req.body._id, (err, r) => {
                     if (err) {
-                        res.status(500).send("Error editing post");
+                        res.status(500).json({ success: false, response: "Error editing post" });
                         return;
                     }
                     r.save()
@@ -93,12 +93,12 @@ postRoutes.route('/edit').post((req, res) => {
                     })
                     .catch((e) => {
                         console.error(e);
-                        res.status(500).send("Error creating post");
+                        res.status(500).json({ success: false, response: "Error creating post" });
                     });
-                    res.status(200).send("Edited post");
+                    res.status(200).json({ success: true, response: "Edited post" });
                 });
             } else {
-                res.status(401).send("Invalid permissions to delete post.");
+                res.status(401).json({ success: false, response: "Invalid permissions to delete post." });
                 return;
             }
         })
@@ -115,10 +115,10 @@ postRoutes.route('/id').post((req, res) => {
     Post.findById(req.body._id, (err, post) => {
         if (err) {
             console.error(err);
-            res.status(500).send("Error getting posts");
+            res.status(500).json({ success: false, response: "Error getting posts" });
             return;
         }
-        res.status(200).send(post);
+        res.status(200).json({ success: true, response: post });
     });
 });
 
@@ -133,10 +133,10 @@ postRoutes.route('/date').post((req, res) => {
     Post.find({ date: d}, (err, post) => {
         if (err) {
             console.error(err);
-            res.status(500).send("Error getting posts");
+            res.status(500).json({ success: false, response: "Error getting posts" });
             return;
         }
-        res.status(200).send(post);
+        res.status(200).json({ success: true, response: post });
     });
 });
 
@@ -150,10 +150,10 @@ postRoutes.route('/all').get((req, res) => {
     Post.find({}, (err, postArr) => {
         if (err) {
             console.error(err);
-            res.status(500).send("Error getting posts");
+            res.status(500).json({ success: false, response: "Error getting posts" });
             return;
         }
-        res.status(200).send(postArr);
+        res.status(200).json({ success: true, response: postArr });
     });
 });
 
@@ -169,13 +169,11 @@ postRoutes.route('/today').get((req, res) => {
     Post.find({ date: date }, (err, postArr) => {
         if (err) {
             console.error(err);
-            res.status(500).send("Error getting posts");
+            res.status(500).json({ success: false, response: "Error getting posts" });
             return;
         }
-        res.status(200).send(postArr);
+        res.status(200).json({ success: true, response: postArr });
     });
 });
-
-
 
 module.exports = postRoutes;

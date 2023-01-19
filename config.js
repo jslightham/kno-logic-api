@@ -17,11 +17,15 @@ config.mail.pass = "password";
 config.mail.from = "name";
 
 /*
- * Session purge settings
+ * Session settings
 */
 // Maximum session length in days
 config.maxSessionLength = 1;
 config.maxRefreshLength = 360;
+
+// Session string character length
+config.sessionCharacterLength = 25;
+config.refreshChracterLength = 60;
 
 /*
  * SSL settings
@@ -48,6 +52,5 @@ config.http.port = 8080;
 */
 config.db = {}
 config.db.connection = 'mongodb://localhost:27017/kno-logic';
-
 
 module.exports = config;

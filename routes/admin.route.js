@@ -15,7 +15,7 @@ let User = require('../schema/user.model');
 */
 adminRoutes.route('/stats').post((req, res) => {
     if (!req.body) {
-        res.status(401).send("Missing body");
+        res.status(401).json({ success: false, response: "Missing body" });
         return;
     }
     utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
@@ -31,13 +31,13 @@ adminRoutes.route('/stats').post((req, res) => {
                             User.count({}, (err, userCount) => {
                                 stats.userCount = userCount;
                                 stats.date = Date();
-                                res.json(stats);
+                                res.status(200).json({ success: true, response: stats });
                             });
                         });
                     });
                 });
             } else {
-                res.status(401).send("Invalid permissions to view stats.");
+                res.status(401).json({ success: false, response: "Invalid permissions to view stats" });
                 return;
             }
         })
