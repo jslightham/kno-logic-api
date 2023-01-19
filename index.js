@@ -13,7 +13,6 @@ const postRoutes = require('./routes/post.route');
 const categoryRoutes = require('./routes/category.route');
 const mongoSanitize = require('express-mongo-sanitize');
 const fs = require("fs");
-const { Http2ServerRequest } = require('http2');
 const https = require('https');
 
 console.log("Starting Kno-Logic Backend Server");
@@ -46,10 +45,11 @@ app.use(function(req, res, next) {
 app.use(mongoSanitize());
 
 // Express routes
-app.use('/admin', adminRoutes);
-app.use('/user', userRoutes);
-app.use('/post', postRoutes);
-app.use('/category', categoryRoutes);
+app.use('/v1/admin', adminRoutes);
+app.use('/v1/user', userRoutes);
+app.use('/v1/post', postRoutes);
+app.use('/v1/category', categoryRoutes);
+app.use('/manage', express.static('public'));
 
 app.listen(config.http.port, () => {
     console.log('Express server running on port:', PORT);
@@ -62,7 +62,6 @@ if (config.ssl.use) {
     }
     https.createServer(options, app).listen(config.ssl.port);
 }
-
 
 // Cron jobs
 var purge = new CronJob('*/5 * * * *', utils.cron.purgeSessions);
