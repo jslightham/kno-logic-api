@@ -1,0 +1,59 @@
+<html>
+
+<head>
+    
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+</head>
+
+<body>
+    <center>
+        <h1>Kno-Logic Management Portal</h1>
+            <table border="black">
+                <th colspan="4">
+                    Home
+                </th>
+                <tr>
+                    <td>
+                        <a href="/manage/manageHome.html">Home</a>
+                    </td>
+                    <td>
+                        <a href="/manage/managePosts.html">Manage Posts</a>
+                    </td>
+                    <td>
+                        <a href="/manage/manageCategories.html">Manage Categories</a>
+                    </td>
+                    <td>
+                        <a href="/manage/manageHome.html">Analytics</a>
+                    </td>
+                </tr>
+            </table>
+    </center>
+</body>
+
+<script src="./consts.js"></script> 
+
+<script>
+    function login() {
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
+
+        (async () => {
+            const rawResponse = await fetch(backendURL + '/v1/user/login', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email, password: password })
+            });
+            const content = await rawResponse.text();
+
+            console.log(content);
+        })();
+
+    }
+</script>
+
+</html>
