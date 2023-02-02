@@ -1,59 +1,64 @@
 <html>
 
 <head>
-    
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
     <center>
         <h1>Kno-Logic Management Portal</h1>
-            <table border="black">
-                <th colspan="4">
-                    Home
-                </th>
-                <tr>
-                    <td>
-                        <a href="/manage/manageHome.html">Home</a>
-                    </td>
-                    <td>
-                        <a href="/manage/managePosts.html">Manage Posts</a>
-                    </td>
-                    <td>
-                        <a href="/manage/manageCategories.html">Manage Categories</a>
-                    </td>
-                    <td>
-                        <a href="/manage/manageHome.html">Analytics</a>
-                    </td>
-                </tr>
-            </table>
+        <table border="black">
+            <th colspan="4">
+                Home
+            </th>
+            <tr>
+                <td>
+                    <a href="/manage/manageHome.html">Home</a>
+                </td>
+                <td>
+                    <a href="/manage/managePosts.html">Manage Posts</a>
+                </td>
+                <td>
+                    <a href="/manage/manageCategories.html">Manage Categories</a>
+                </td>
+                <td>
+                    <a href="/manage/manageHome.html">Analytics</a>
+                </td>
+            </tr>
+        </table>
     </center>
 </body>
 
-<script src="./consts.js"></script> 
+<script src="./consts.js"></script>
 
 <script>
-    function login() {
-        let email = document.getElementById("email").value;
-        let password = document.getElementById("password").value;
+    function verifySession() {
+        let userId = getCookie("userId");
+        let sessionId = getCookie("sessionId");
 
         (async () => {
-            const rawResponse = await fetch(backendURL + '/v1/user/login', {
+            const rawResponse = await fetch(backendURL + '/v1/user/check-token', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email: email, password: password })
+                body: JSON.stringify({ userId: userId, sessionId: sessionId })
             });
-            const content = await rawResponse.text();
+            const content = await rawResponse.json();
 
-            console.log(content);
+            if (!content.success) {
+                window.location.replace("/manage/index.html");
+            }
         })();
-
     }
+
+    verifySession();
 </script>
 
 </html>

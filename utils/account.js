@@ -4,12 +4,17 @@ const bcrypt = require('bcrypt');
 
 // checkSession(userId, sessionId) checks if the sessionId is valid for the user
 const checkSession = (userId, sessionId, f) => {
+    let success = false;
     Session.find({ userId: userId, sessionId: sessionId }, (err, res) => {
-        if (res && res.type == 0) {
-            f(true);
-            return;
-        }
-        f(false);
+        res.forEach(element => {
+            if (element.type == 0 && !success) {
+                success = true;
+                f(true);
+                return;
+            }
+        })
+        if (!success)
+            f(false);
     });
 }
 

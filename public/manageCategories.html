@@ -1,0 +1,156 @@
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <center>
+        <h1>Kno-Logic Management Portal</h1>
+        <table border="black">
+            <th colspan="4">
+                Manage Categories
+            </th>
+            <tr>
+                <td>
+                    <a href="/manage/manageHome.html">Home</a>
+                </td>
+                <td>
+                    <a href="/manage/managePosts.html">Manage Posts</a>
+                </td>
+                <td>
+                    <a href="/manage/manageCategories.html">Manage Categories</a>
+                </td>
+                <td>
+                    <a href="/manage/manageHome.html">Analytics</a>
+                </td>
+            </tr>
+        </table>
+
+        <br>
+        <table border="black">
+            <th colspan="2">
+                Add Category
+            </th>
+            <tr>
+                <td>
+                    <label for="name">Category Name: </label>
+                </td>
+                <td>
+                    <input type="text" id="name" name="name">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="color">Category Color: </label>
+                </td>
+                <td>
+                    <input type="color" id="color" name="color">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <center><button type="button" onclick="addCategory()">Add Category</button></center>
+                </td>
+            </tr>
+        </table>
+
+        <br>
+
+        <table border="black" id="listTable">
+            <th colspan="2">
+                List Categories
+            </th>
+            <tr>
+                <td>
+                    <strong>Name</strong>
+                </td>
+                <td>
+                    <strong>Color</strong>
+                </td>
+                </th>
+                <tbody>
+
+                </tbody>
+
+        </table>
+    </center>
+</body>
+
+<script src="./consts.js"></script>
+
+<script>
+    function verifySession() {
+        let userId = getCookie("userId");
+        let sessionId = getCookie("sessionId");
+
+        (async () => {
+            const rawResponse = await fetch(backendURL + '/v1/user/check-token', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: userId, sessionId: sessionId })
+            });
+            const content = await rawResponse.json();
+
+            if (!content.success) {
+                window.location.replace("/manage/index.html");
+            }
+        })();
+    }
+
+    function getCategories() {
+        (async () => {
+            const rawResponse = await fetch(backendURL + '/v1/category/all', {
+                method: 'GET',
+            });
+            const content = await rawResponse.json();
+
+            var tbodyRef = document.getElementById('listTable').getElementsByTagName('tbody')[0];
+
+            content.response.forEach(element => {
+                var newRow = tbodyRef.insertRow();
+                newRow.innerHTML = `<td>${element.name}</td><td><input type='color' value='${element.color}' disabled></td>`;
+            });
+        })();
+    }
+
+    function addCategory() {
+        let userId = getCookie("userId");
+        let sessionId = getCookie("sessionId");
+        let name = document.getElementById("name").value;
+        let color = document.getElementById("color").value;
+
+        (async () => {
+            const rawResponse = await fetch(backendURL + '/v1/category/create', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: userId, sessionId: sessionId, category: { name: name, color: color } })
+            });
+            const content = await rawResponse.json();
+
+            if (content.success) {
+                window.location.reload();
+            } else {
+                alert("Could not add category: " + content.response);
+            }
+
+            console.log(content);
+        })();
+    }
+
+    verifySession();
+    getCategories();
+</script>
+
+</html>

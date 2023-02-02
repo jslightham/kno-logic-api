@@ -21,7 +21,7 @@ categoryRoutes.route('/create').post((req, res) => {
     utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
         utils.account.isAdmin(req.body.userId, (isAdmin) => {
             if (isValidId && isAdmin) {
-                let c = new Category(req.body);
+                let c = new Category(req.body.category);
                 c.save()
                     .then(() => {
                         res.status(200).json({ success: true, response: c });

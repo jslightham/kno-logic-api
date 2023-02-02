@@ -243,6 +243,17 @@ userRoutes.route('/favorite/get').post((req, res) => {
     })
 })
 
+userRoutes.route('/check-token').post((req, res) => {
+    utils.account.checkSession(req.body.userId, req.body.sessionId, valid => {
+        if (valid) {
+            res.status(200).json({ success: true, response: "Valid SessionId" });
+
+        } else {
+            res.status(401).json({ success: false, response: "Incorrect SessionId" });
+        }
+    });
+});
+
 userRoutes.route('/refresh').post((req, res) => {
     utils.account.checkRefresh(req.body.userId, req.body.refresh, valid => {
         if (valid) {

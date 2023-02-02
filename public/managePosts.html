@@ -1,0 +1,250 @@
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <center>
+        <h1>Kno-Logic Management Portal</h1>
+        <table border="black">
+            <th colspan="4">
+                Manage Posts
+            </th>
+            <tr>
+                <td>
+                    <a href="/manage/manageHome.html">Home</a>
+                </td>
+                <td>
+                    <a href="/manage/managePosts.html">Manage Posts</a>
+                </td>
+                <td>
+                    <a href="/manage/manageCategories.html">Manage Categories</a>
+                </td>
+                <td>
+                    <a href="/manage/manageHome.html">Analytics</a>
+                </td>
+            </tr>
+        </table>
+
+        <br>
+        <table border="black">
+            <th colspan="2">
+                Add Post
+            </th>
+            <tr>
+                <td>
+                    <label for="title">Title: </label>
+                </td>
+                <td>
+                    <input type="text" id="title" name="title">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="description">Description: </label>
+                </td>
+                <td>
+                    <textarea id="description" name="description"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="author">Author: </label>
+                </td>
+                <td>
+                    <input type="text" id="author" name="author">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="category">Category (hold <code>CTRL</code> to select multiple): </label>
+                </td>
+                <td>
+                    <select name="category" id="category" style="width: 100%; height: 100px;" multiple>
+
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="link">Link: </label>
+                </td>
+                <td>
+                    <input type="text" id="link" name="link">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="date">Date: </label>
+                </td>
+                <td>
+                    <input type="date" id="date" name="date">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <center><button type="button" onclick="addPost()">Add Post</button></center>
+                </td>
+            </tr>
+        </table>
+
+        <br>
+
+        <table border="black" id="listTable">
+            <th colspan="9">
+                List Posts
+            </th>
+            <tr>
+                <td>
+                    <strong>Title</strong>
+                </td>
+                <td>
+                    <strong>Description</strong>
+                </td>
+                <td>
+                    <strong>Author</strong>
+                </td>
+                <td>
+                    <strong>Category</strong>
+                </td>
+                <td>
+                    <strong>Link</strong>
+                </td>
+                <td>
+                    <strong>Date</strong>
+                </td>
+                <td>
+                    <strong>Photo</strong>
+                </td>
+                <td>
+                    <strong>Edit</strong>
+                </td>
+                <td>
+                    <strong>Delete</strong>
+                </td>
+                </th>
+                <tbody>
+
+                </tbody>
+
+        </table>
+    </center>
+</body>
+
+<script src="./consts.js"></script>
+
+<script>
+    function verifySession() {
+        let userId = getCookie("userId");
+        let sessionId = getCookie("sessionId");
+
+        (async () => {
+            const rawResponse = await fetch(backendURL + '/v1/user/check-token', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: userId, sessionId: sessionId })
+            });
+            const content = await rawResponse.json();
+
+            if (!content.success) {
+                window.location.replace("/manage/index.html");
+            }
+        })();
+    }
+
+    function getCategories() {
+        (async () => {
+            const rawResponse = await fetch(backendURL + '/v1/category/all', {
+                method: 'GET',
+            });
+            const content = await rawResponse.json();
+
+            var categoryRef = document.getElementById('category');
+
+            content.response.forEach(element => {
+                categoryRef.appendChild(new Option(element.name, element._id))
+            });
+        })();
+    }
+
+    function getPosts() {
+        (async () => {
+            const rawResponse = await fetch(backendURL + '/v1/post/all', {
+                method: 'GET',
+            });
+            const content = await rawResponse.json();
+
+            console.log(content);
+
+            var tbodyRef = document.getElementById('listTable').getElementsByTagName('tbody')[0];
+
+            content.response.forEach(element => {
+                var newRow = tbodyRef.insertRow();
+                newRow.innerHTML = `<td>${element.title}</td><td>${element.description}</td><td>${element.author}</td><td>${element.category.toString()}</td><td>${element.link}</td><td>${element.date}</td><td>${element.photo} <br> Edit Photo</td><td>Edit</td><td>Delete</td>`;
+            });
+        })();
+    }
+
+    function addPost() {
+        let userId = getCookie("userId");
+        let sessionId = getCookie("sessionId");
+        let title = document.getElementById("title").value;
+        let description = document.getElementById("description").value;
+        let author = document.getElementById("author").value;
+        let category = getSelectValues(document.getElementById("category"));
+        let link = document.getElementById("link").value;
+        let date = document.getElementById("date").value;
+
+        console.log(category);
+
+
+        (async () => {
+            const rawResponse = await fetch(backendURL + '/v1/post/create', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: userId, sessionId: sessionId, 
+                    post: { title: title, description: description, author: author, category: category, link: link, date: date } })
+            });
+            const content = await rawResponse.json();
+
+            if (content.success) {
+                window.location.reload();
+            } else {
+                alert("Could not add post: " + content.response);
+            }
+        })();
+    }
+
+    function getSelectValues(select) {
+        let result = [];
+        let options = select && select.options;
+        let opt;
+
+        for (let i = 0, iLen = options.length; i < iLen; i++) {
+            opt = options[i];
+
+            if (opt.selected) {
+                result.push(opt.value || opt.text);
+            }
+        }
+        return result;
+    }
+
+    verifySession();
+    getCategories();
+    getPosts();
+</script>
+
+</html>

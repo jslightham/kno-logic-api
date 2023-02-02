@@ -21,7 +21,7 @@ postRoutes.route('/create').post((req, res) => {
     utils.account.checkSession(req.body.userId, req.body.sessionId, (isValidId) => {
         utils.account.isAdmin(req.body.userId, (isAdmin) => {
             if (isValidId && isAdmin) {
-                let p = new Post(req.body);
+                let p = new Post(req.body.post);
                 p.date = utils.date.dateToEpoch(p.date);
                 p.save()
                     .then(() => {
